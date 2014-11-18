@@ -46,6 +46,11 @@ Fishbowl exposes the exception that is thrown by the piece of code that
 has been provided to `exceptionThrownBy`. This exception can be checked
 by any assertion library. (The example uses JUnit's `Assert` class.)
 
+In case that the statement did not throw an exception, Fishbowl itself
+throws an `ExceptionNotThrownFailure`. This causes the test to fail
+
+    com.github.stefanbirkner.fishbowl.ExceptionNotThrownFailure: The Statement did not throw an exception.
+
 ### Example for Several Assertion Libraries
 
 The example above uses JUnit's `Assert` class. Below is the same test

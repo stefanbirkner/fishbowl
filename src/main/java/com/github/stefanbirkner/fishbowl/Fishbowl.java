@@ -19,6 +19,12 @@ package com.github.stefanbirkner.fishbowl;
  * that has been provided to {@code exceptionThrownBy}. This exception
  * can be checked by any assertion library. (The example uses JUnit's
  * {@code Assert} class.)
+ * <p>In case that the statement did not thrown an exception, Fishbowl
+ * itself throws an {@link ExceptionNotThrownFailure}. This causes the
+ * test to fail
+ * <pre>
+ * com.github.stefanbirkner.fishbowl.ExceptionNotThrownFailure: The Statement did not throw an exception.
+ * </pre>
  *
  * <h3>Example for Several Assertion Libraries</h3>
  * The example above uses JUnit's {@code Assert} class. Below is the
@@ -72,16 +78,17 @@ public class Fishbowl {
      * has been thrown by the statement.
      *
      * @param statement an arbitrary piece of code.
-     * @return The exception thrown by the statement or {@code null} if
-     * the statement doesn't throw an exception.
+     * @return The exception thrown by the statement.
+     * @throws ExceptionNotThrownFailure if the statement didn't throw
+     * an exception.
      */
     public static Throwable exceptionThrownBy(Statement statement) {
         try {
             statement.evaluate();
-            return null;
         } catch (Throwable e) {
             return e;
         }
+        throw new ExceptionNotThrownFailure();
     }
 
     /**
