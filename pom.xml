@@ -9,7 +9,7 @@
     </parent>
 
     <artifactId>fishbowl</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Fishbowl</name>
@@ -35,7 +35,7 @@
         <connection>scm:git:git://github.com/stefanbirkner/fishbowl.git</connection>
         <developerConnection>scm:git:git@github.com:stefanbirkner/fishbowl.git</developerConnection>
         <url>https://github.com/stefanbirkner/fishbowl/</url>
-      <tag>fishbowl-1.0.0</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <properties>
