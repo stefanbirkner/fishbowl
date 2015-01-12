@@ -130,6 +130,8 @@ CI.
 
 * Select a new version according to the
   [Semantic Versioning 2.0.0 Standard](http://semver.org/).
-* Set the new version in the `Installation` section of this readme.
-* Run `mvn release:prepare`
-* Run `mvn release:perform`
+* Set the new version in `pom.xml` and in the `Installation` section of
+  this readme.
+* Commit the modified `pom.xml` and `README.md`.
+* Run `mvn clean deploy`
+* Add a tag for the release: `git tag fishbowl-X.X.X`
