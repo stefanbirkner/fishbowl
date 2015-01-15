@@ -15,7 +15,7 @@ public class FishbowlTest {
     private static final Throwable DUMMY_EXCEPTION = new Exception();
 
     @Rule
-    public final ExpectedException thrown = none().handleAssertionErrors();
+    public final ExpectedException thrown = none();
 
     @Test
     public void exposesException() {
