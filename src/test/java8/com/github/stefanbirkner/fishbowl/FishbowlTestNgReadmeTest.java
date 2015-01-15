@@ -47,4 +47,11 @@ public class FishbowlTestNgReadmeTest {
         Throwable exception = exceptionThrownBy(() -> noString.trim());
         Truth.assertThat(exception).isInstanceOf(NullPointerException.class);
     }
+
+    @Test
+    public void expectExceptionOfACertainType() {
+        FooException exception = exceptionThrownBy(
+            () -> { throw new FooException(3); }, FooException.class);
+        assertEquals(3, exception.getValue());
+    }
 }

@@ -11,7 +11,7 @@ package com.github.stefanbirkner.fishbowl;
  * &#064;Test
  * public void anExceptionIsThrown() {
  *   String noString = null;
- *   Throwable exception = {@link #exceptionThrownBy exceptionThrownBy}(() -&gt; noString.trim());
+ *   Throwable exception = {@link #exceptionThrownBy(Statement) exceptionThrownBy}(() -&gt; noString.trim());
  *   assertEquals(NullPointerException.class, exception.getClass());
  * }
  * </pre>
@@ -25,7 +25,24 @@ package com.github.stefanbirkner.fishbowl;
  * <pre>
  * com.github.stefanbirkner.fishbowl.ExceptionNotThrownFailure: The Statement did not throw an exception.
  * </pre>
- *
+ * <p>If you need the exception to have a certain type then you can
+ * call {@code exceptionThrownBy} with this type as second argument.
+ * (E.g. for verifying the state of custom exceptions.)
+ * <pre>
+ * FooException exception = {@link #exceptionThrownBy(Statement, java.lang.Class) exceptionThrownBy}(
+ *         () -&gt; { throw new FooException(3); }, FooException.class);
+ * assertEquals(3, exception.getValue())
+ * </pre>
+ * <p>In case that the statement threw an exception of a different
+ * type, Fishbowl itself throws an
+ * {@code ExceptionWithWrongTypeThrownFailure}. This causes the test to
+ * fail:
+ * <pre>
+ * com.github.stefanbirkner.fishbowl.ExceptionWithWrongTypeThrownFailure: The Statement threw an FooException instead of an java.lang.NullPointerException.
+ *     ...
+ * Caused by: FooException
+ *     ...
+ * </pre>
  * <h3>Example for Several Assertion Libraries</h3>
  * The example above uses JUnit's {@code Assert} class. Below is the
  * same test with other assertion libraries.
@@ -83,16 +100,37 @@ public class Fishbowl {
      * an exception.
      */
     public static Throwable exceptionThrownBy(Statement statement) {
+        return exceptionThrownBy(statement, Throwable.class);
+    }
+
+    /**
+     * Executes the provided statement and returns the exception that
+     * has been thrown by the statement if it has the specified type.
+     *
+     * @param statement an arbitrary piece of code.
+     * @param type the type of the exception that should be exposed.
+     * @param <T> the type of the exception that should be exposed.
+     * @return The exception thrown by the statement.
+     * @throws ExceptionNotThrownFailure if the statement didn't throw
+     * an exception.
+     * @throws ExceptionWithWrongTypeThrownFailure if the statement
+     * threw an exception of a different type.
+     */
+    public static <T extends Throwable> T exceptionThrownBy(
+        Statement statement, Class<T> type) {
         try {
             statement.evaluate();
         } catch (Throwable e) {
-            return e;
+            if (type.isAssignableFrom(e.getClass()))
+                return (T) e;
+            else
+                throw new ExceptionWithWrongTypeThrownFailure(type, e);
         }
         throw new ExceptionNotThrownFailure();
     }
 
     /**
-     * This class only provides a static method. Hence nobody should
+     * This class only provides static methods. Hence nobody should
      * create {@code Fishbowl} objects.
      */
     private Fishbowl() {

@@ -19,7 +19,7 @@ Fishbowl is available from [Maven Central](http://search.maven.org/).
     <dependency>
       <groupId>com.github.stefanbirkner</groupId>
       <artifactId>fishbowl</artifactId>
-      <version>1.0.1</version>
+      <version>1.1.0</version>
     </dependency>
 
 Please don't forget to add the scope `test` if you use Fishbowl for
@@ -47,9 +47,26 @@ has been provided to `exceptionThrownBy`. This exception can be checked
 by any assertion library. (The example uses JUnit's `Assert` class.)
 
 In case that the statement did not throw an exception, Fishbowl itself
-throws an `ExceptionNotThrownFailure`. This causes the test to fail
+throws an `ExceptionNotThrownFailure`. This causes the test to fail:
 
     com.github.stefanbirkner.fishbowl.ExceptionNotThrownFailure: The Statement did not throw an exception.
+
+If you need the exception to have a certain type then you can call
+`exceptionThrownBy` with this type as second argument. (E.g. for
+verifying the state of custom exceptions.)
+
+    FooException exception = exceptionThrownBy(
+            () -> { throw new FooException(3); }, FooException.class);
+    assertEquals(3, exception.getValue())
+
+In case that the statement threw an exception of a different type,
+Fishbowl itself throws an `ExceptionWithWrongTypeThrownFailure`. This
+causes the test to fail:
+
+    com.github.stefanbirkner.fishbowl.ExceptionWithWrongTypeThrownFailure: The Statement threw a FooException instead of a java.lang.NullPointerException.
+        ...
+    Caused by: FooException
+        ...
 
 ### Example for Several Assertion Libraries
 
@@ -138,9 +155,18 @@ CI.
 
 ## Release Notes
 
+### Release 1.1.0
+
+Add a new method
+
+    exceptionThrownBy(Statement, Class<? extends Throwable>)
+
+that returns a certain type of exception. This is necessary for
+verifying the state of custom exceptions.
+
 ### Release 1.0.1
 
-Recompiled the library with JDK 7. Release 1.0.0 has been created with
+Recompile the library with JDK 7. Release 1.0.0 has been created with
 JDK 8 and because of this the library cannot be used with JDK < 8.
 Compilation aborts with the message
 
