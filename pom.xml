@@ -35,8 +35,8 @@
         <connection>scm:git:git://github.com/stefanbirkner/fishbowl.git</connection>
         <developerConnection>scm:git:git@github.com:stefanbirkner/fishbowl.git</developerConnection>
         <url>https://github.com/stefanbirkner/fishbowl/</url>
-      <tag>HEAD</tag>
-  </scm>
+        <tag>HEAD</tag>
+    </scm>
 
     <properties>
         <maven.compiler.source>1.6</maven.compiler.source>
