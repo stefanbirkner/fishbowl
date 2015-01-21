@@ -19,7 +19,7 @@ Fishbowl is available from [Maven Central](http://search.maven.org/).
     <dependency>
       <groupId>com.github.stefanbirkner</groupId>
       <artifactId>fishbowl</artifactId>
-      <version>1.1.0</version>
+      <version>1.1.1</version>
     </dependency>
 
 Please don't forget to add the scope `test` if you use Fishbowl for
@@ -150,10 +150,18 @@ CI.
 * Set the new version in `pom.xml` and in the `Installation` section of
   this readme.
 * Commit the modified `pom.xml` and `README.md`.
-* Run `mvn clean deploy`
+* Run `mvn clean deploy` with JDK 6 or 7.
 * Add a tag for the release: `git tag fishbowl-X.X.X`
 
 ## Release Notes
+
+### Release 1.1.1
+
+Recompile the library with JDK 7. Release 1.1.0 has been created with
+JDK 8 and because of this the library cannot be used with JDK < 8.
+Compilation aborts with the message
+
+    Unsupported major.minor version 52.0
 
 ### Release 1.1.0
 
