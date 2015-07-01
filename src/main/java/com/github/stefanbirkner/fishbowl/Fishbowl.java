@@ -1,103 +1,54 @@
 package com.github.stefanbirkner.fishbowl;
 
 /**
- * Exposes exceptions that are thrown by an arbitrary piece of code.
- * Thus you can write tests for that piece of code by following the
- * <a href="http://c2.com/cgi/wiki?ArrangeActAssert">AAA
- * (Arrange-Act-Assert) pattern</a>.
- * <p>The following test verifies that the statement
- * {@code noString.trim()} throws a {@code NullPointerException}.
- * <pre>
- * &#064;Test
- * public void anExceptionIsThrown() {
- *   String noString = null;
- *   Throwable exception = {@link #exceptionThrownBy(Statement) exceptionThrownBy}(() -&gt; noString.trim());
- *   assertEquals(NullPointerException.class, exception.getClass());
- * }
- * </pre>
- * Fishbowl exposes the exception that is thrown by the piece of code
- * that has been provided to {@code exceptionThrownBy}. This exception
- * can be checked by any assertion library. (The example uses JUnit's
- * {@code Assert} class.)
- * <p>In case that the statement did not thrown an exception, Fishbowl
- * itself throws an {@link ExceptionNotThrownFailure}. This causes the
- * test to fail
- * <pre>
- * com.github.stefanbirkner.fishbowl.ExceptionNotThrownFailure: The Statement did not throw an exception.
- * </pre>
- * <p>If you need the exception to have a certain type then you can
- * call {@code exceptionThrownBy} with this type as second argument.
- * (E.g. for verifying the state of custom exceptions.)
- * <pre>
- * FooException exception = {@link #exceptionThrownBy(Statement, java.lang.Class) exceptionThrownBy}(
- *         () -&gt; { throw new FooException(3); }, FooException.class);
- * assertEquals(3, exception.getValue())
- * </pre>
- * <p>In case that the statement threw an exception of a different
- * type, Fishbowl itself throws an
- * {@code ExceptionWithWrongTypeThrownFailure}. This causes the test to
- * fail:
- * <pre>
- * com.github.stefanbirkner.fishbowl.ExceptionWithWrongTypeThrownFailure: The Statement threw an FooException instead of an java.lang.NullPointerException.
- *     ...
- * Caused by: FooException
- *     ...
- * </pre>
- * <h3>Example for Several Assertion Libraries</h3>
- * The example above uses JUnit's {@code Assert} class. Below is the
- * same test with other assertion libraries.
- *
- * <h4>Hamcrest</h4>
- * <pre>
- * &#064;Test
- * public void anExceptionIsThrown() {
- *   String noString = null;
- *   Throwable exception = exceptionThrownBy(() -&gt; noString.trim());
- *   assertThat(exception, instanceOf(NullPointerException.class));
- * }
- * </pre>
- *
- * <h4>AssertJ, FEST, Truth</h4>
- * <p>The test looks the same for all three assertion libraries. The
- * only difference is the class that provides {@code assertThat}.
- * <pre>
- * &#064;Test
- * public void anExceptionIsThrown() {
- *   String noString = null;
- *   Throwable exception = exceptionThrownBy(() -&gt; noString.trim());
- *   assertThat(exception).isInstanceOf(NullPointerException.class);
- * }
- * </pre>
- * For AssertJ please have a look at
- * <a href="http://joel-costigliola.github.io/assertj/core/api/org/assertj/core/api/AbstractThrowableAssert.html">AbstractThrowableAssert</a>
- * for further asserts.
- *
- * <h3>Java 6 and 7</h3>
- * <p>Fishbowl has been created with Java 8 in mind, but it can be used
- * with Java 6 and 7, too. In this case you have to use anonymous
- * classes. Here is the example from above for Java 6 and 7.
- * <pre>
- * &#064;Test
- * public void anExceptionIsThrown() {
- *   final String noString = null;
- *   Throwable exception = exceptionThrownBy(new Statement() {
- *     public void evaluate() throws Throwable {
- *       noString.trim();
- *     }
- *   }
- *   assertEquals(NullPointerException.class, exception.getClass());
- * }
- * </pre>
+ * {@code Fishbowl} provides helper methods for dealing with exceptions.
+ * <h2>Wrap Exceptions</h2>
+ * <p>There are three options for dealing with checked exceptions that are
+ * thrown inside of a method.
+ * <ul>
+ *     <li>Catch the exception and do some error handling.</li>
+ *     <li>Add the exception's class to the throws part of the method's
+ *     signature and don't handle it.</li>
+ *     <li>Throw a {@code RuntimeException} that encloses the original exception.</li>
+ * </ul>
+ * <p>The methods {@link #wrapCheckedException(Statement)} (for
+ * statements without a return value) and
+ * {@link #wrapCheckedException(StatementWithReturnValue)} (for
+ * statements with a return value) can be used for the third option.
+ * They replace the try-catch-throw-RuntimeException snippet that is
+ * usually used.
+ * <h2>Expose Exceptions</h2>
+ * <p>Fishbowl can expose exceptions that are thrown by an arbitrary
+ * piece of code. Thus you can write tests for that piece of code by
+ * following the <a href="http://c2.com/cgi/wiki?ArrangeActAssert">AAA
+ * (Arrange-Act-Assert) pattern</a>. Use
+ * {@link #exceptionThrownBy(Statement)} for catching any
+ * {@code Throwable} or use
+ * {@link #exceptionThrownBy(Statement, Class)} for catching
+ * exceptions of a specific type only.
  */
 public class Fishbowl {
     /**
      * Executes the provided statement and returns the exception that
-     * has been thrown by the statement.
+     * has been thrown by the statement. This is useful for writing
+     * tests for exceptions according to the AAA (Arrange-Act-Assert)
+     * pattern.
+     * <p>The following test verifies that the statement
+     * {@code noString.trim()} throws a {@code NullPointerException}.
+     * <pre>
+     * &#064;Test
+     * public void anExceptionIsThrown() {
+     *   String noString = null;
+     *   Throwable exception = exceptionThrownBy}(() -&gt; noString.trim());
+     *   assertEquals(NullPointerException.class, exception.getClass());
+     * }
+     * </pre>
      *
      * @param statement an arbitrary piece of code.
      * @return The exception thrown by the statement.
      * @throws ExceptionNotThrownFailure if the statement didn't throw
      * an exception.
+     * @see #exceptionThrownBy(Statement, Class)
      */
     public static Throwable exceptionThrownBy(Statement statement) {
         return exceptionThrownBy(statement, Throwable.class);
@@ -106,6 +57,15 @@ public class Fishbowl {
     /**
      * Executes the provided statement and returns the exception that
      * has been thrown by the statement if it has the specified type.
+     * This is useful for writing tests for exceptions according to the
+     * AAA (Arrange-Act-Assert) pattern in case that you need to check
+     * properties of the exception.
+     * <p>Example:
+     * <pre>
+     * FooException exception = exceptionThrownBy(
+     *         () -&gt; { throw new FooException(3); }, FooException.class);
+     * assertEquals(3, exception.getValue())
+     * </pre>
      *
      * @param statement an arbitrary piece of code.
      * @param type the type of the exception that should be exposed.
@@ -115,6 +75,7 @@ public class Fishbowl {
      * an exception.
      * @throws ExceptionWithWrongTypeThrownFailure if the statement
      * threw an exception of a different type.
+     * @see #exceptionThrownBy(Statement)
      */
     public static <T extends Throwable> T exceptionThrownBy(
         Statement statement, Class<T> type) {
@@ -127,6 +88,84 @@ public class Fishbowl {
                 throw new ExceptionWithWrongTypeThrownFailure(type, e);
         }
         throw new ExceptionNotThrownFailure();
+    }
+
+    /**
+     * Executes the given statement and encloses any checked exception
+     * thrown with an unchecked {@link WrappedException}, that
+     * is thrown instead. The method
+     * <pre>
+     *   public void doSomething() {
+     *     wrapCheckedException(() -&gt; throw new IOException());
+     *   }
+     * </pre>
+     * <p>throws a {@code WrappedException} that encloses the
+     * {@code IOException}.
+     * <p>This avoids adding {@code throws IOException} to the method's
+     * signature and is a replacement for the common
+     * try-catch-throw-RuntimeException pattern:
+     * <pre>
+     *   public void doSomething() {
+     *     try {
+     *         throw new IOException();
+     *     } catch (IOException e) {
+     *         throw new RuntimeException(e);
+     *     }
+     *   }
+     * </pre>
+     *
+     * @param statement The statement that is executed.
+     * @see #wrapCheckedException(StatementWithReturnValue)
+     */
+    public static void wrapCheckedException(Statement statement) {
+        try {
+            statement.evaluate();
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new WrappedException(e);
+        }
+    }
+
+    /**
+     * Executes the given statement and encloses any checked exception
+     * thrown with an unchecked {@link WrappedException}, that
+     * is thrown instead. Returns the statement's return value if no
+     * exception is thrown.
+     * <pre>
+     *   public void doSomething() {
+     *     URL url = wrapCheckedException(() -&gt; new URL("http://something/"));
+     *     ...
+     *   }
+     * </pre>
+     * <p>This avoids adding {@code throws MalformedURLException} to the
+     * method's signature and is a replacement for the common
+     * try-catch-throw-RuntimeException pattern:
+     * <pre>
+     *   public void doSomething() {
+     *     URL url;
+     *     try {
+     *         url = new URL("http://something/");
+     *     } catch (MalformedURLException e) {
+     *         throw new RuntimeException(e);
+     *     }
+     *     ...
+     *   }
+     * </pre>
+     *
+     * @param statement The statement that is executed.
+     * @param <V> type of the value that is returned by the statement.
+     * @return the return value of the statement.
+     * @see #wrapCheckedException(Statement)
+     */
+    public static <V> V wrapCheckedException(StatementWithReturnValue<V> statement) {
+        try {
+            return statement.evaluate();
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Throwable e) {
+            throw new WrappedException(e);
+        }
     }
 
     /**

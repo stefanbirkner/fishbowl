@@ -2,11 +2,7 @@
 
 [![Build Status](https://travis-ci.org/stefanbirkner/fishbowl.svg?branch=master)](https://travis-ci.org/stefanbirkner/fishbowl)
 
-Fishbowl makes it possible to use the
-[AAA (Arrange-Act-Assert) pattern](http://c2.com/cgi/wiki?ArrangeActAssert)
-for writing tests for code that throws an exception. For that purpose it
-exposes the exception so that it can be checked by any assertion
-library.
+Fishbowl provides helper methods for dealing with exceptions.
 
 Fishbowl is published under the
 [MIT license](http://opensource.org/licenses/MIT).
@@ -19,7 +15,7 @@ Fishbowl is available from [Maven Central](http://search.maven.org/).
     <dependency>
       <groupId>com.github.stefanbirkner</groupId>
       <artifactId>fishbowl</artifactId>
-      <version>1.1.1</version>
+      <version>1.2.0</version>
     </dependency>
 
 Please don't forget to add the scope `test` if you use Fishbowl for
