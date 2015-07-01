@@ -28,92 +28,9 @@ tests only.
 
 ## Usage
 
-The following test verifies that the statement `noString.trim()` throws
-a `NullPointerException`.
-
-    import static com.github.stefanbirkner.fishbowl.Fishbowl.exceptionThrownBy;
-
-    ...
-
-    @Test
-    public void anExceptionIsThrown() {
-      String noString = null;
-      Throwable exception = exceptionThrownBy(() -> noString.trim());
-      assertEquals(NullPointerException.class, exception.getClass());
-    }
-
-Fishbowl exposes the exception that is thrown by the piece of code that
-has been provided to `exceptionThrownBy`. This exception can be checked
-by any assertion library. (The example uses JUnit's `Assert` class.)
-
-In case that the statement did not throw an exception, Fishbowl itself
-throws an `ExceptionNotThrownFailure`. This causes the test to fail:
-
-    com.github.stefanbirkner.fishbowl.ExceptionNotThrownFailure: The Statement did not throw an exception.
-
-If you need the exception to have a certain type then you can call
-`exceptionThrownBy` with this type as second argument. (E.g. for
-verifying the state of custom exceptions.)
-
-    FooException exception = exceptionThrownBy(
-            () -> { throw new FooException(3); }, FooException.class);
-    assertEquals(3, exception.getValue())
-
-In case that the statement threw an exception of a different type,
-Fishbowl itself throws an `ExceptionWithWrongTypeThrownFailure`. This
-causes the test to fail:
-
-    com.github.stefanbirkner.fishbowl.ExceptionWithWrongTypeThrownFailure: The Statement threw a FooException instead of a java.lang.NullPointerException.
-        ...
-    Caused by: FooException
-        ...
-
-### Example for Several Assertion Libraries
-
-The example above uses JUnit's `Assert` class. Below is the same test
-with other assertion libraries.
-
-#### Hamcrest
-
-    @Test
-    public void anExceptionIsThrown() {
-      String noString = null;
-      Throwable exception = exceptionThrownBy(() -> noString.trim());
-      assertThat(exception, instanceOf(NullPointerException.class));
-    }
-
-#### AssertJ, FEST, Truth
-
-The test looks the same for all three assertion libraries. The only
-difference is the class that provides `assertThat`.
-
-    @Test
-    public void anExceptionIsThrown() {
-      String noString = null;
-      Throwable exception = exceptionThrownBy(() -> noString.trim());
-      assertThat(exception).isInstanceOf(NullPointerException.class);
-    }
-
-For AssertJ please have a look at
-[AbstractThrowableAssert](http://joel-costigliola.github.io/assertj/core/api/org/assertj/core/api/AbstractThrowableAssert.html)
-for further asserts.
-
-### Java 6 and 7
-
-Fishbowl has been created with Java 8 in mind, but it can be used with
-Java 6 and 7, too. In this case you have to use anonymous classes. Here
-is the example from above for Java 6 and 7.
-
-    @Test
-    public void anExceptionIsThrown() {
-      final String noString = null;
-      Throwable exception = exceptionThrownBy(new Statement() {
-        public void evaluate() throws Throwable {
-          noString.trim();
-        }
-      });
-      assertEquals(NullPointerException.class, exception.getClass());
-    }
+Fishbowl's documentation is the Javadoc of the class `Fishbowl`. It is
+available online at
+http://stefanbirkner.github.io/fishbowl/apidocs/com/github/stefanbirkner/fishbowl/Fishbowl.html
 
 
 ## Contributing
@@ -121,7 +38,7 @@ is the example from above for Java 6 and 7.
 You have three options if you have a feature request, found a bug or
 simply have a question about Fishbowl.
 
-* [Write an issue.](https://github.com/stefanbirkner/quaidan/issues/new)
+* [Write an issue.](https://github.com/stefanbirkner/fishbowl/issues/new)
 * Create a pull request. (See [Understanding the GitHub Flow](https://guides.github.com/introduction/flow/index.html))
 * [Write an email to mail@stefan-birkner.de](mailto:mail@stefan-birkner.de)
 
