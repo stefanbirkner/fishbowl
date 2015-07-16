@@ -1,0 +1,49 @@
+---
+layout: index
+title: Fishbowl 
+description: A collection of helper methods for dealing with exceptions in Java 8.
+---
+<section id="overview">
+  <p>The scope of Fishbowl is divided into four sections.</p>
+
+  <h2 class="page-header">Wrapping Exceptions</h2>
+  <div class="row">
+    <div class="col-md-4">
+      <p>Coming soon.</p>
+    </div>
+  </div>
+
+  <h2 class="page-header">Default Values</h2>
+  <div class="row">
+    <div class="col-md-4">
+      <p>Coming soon.</p>
+    </div>
+  </div>
+
+  <h2 class="page-header">Ignoring Exceptions</h2>
+  <div class="row">
+    <div class="col-md-4">
+      <p>Coming soon.</p>
+    </div>
+  </div>
+
+  <h2 class="page-header">Exception Testing</h2>
+  <div class="row">
+    <div class="col-md-4">
+      <p>Fishbowl makes it possible to use the
+      <a href="http://c2.com/cgi/wiki?ArrangeActAssert">AAA (Arrange-Act-Assert)
+      pattern</a> for writing tests for code that throws an exception. For that
+      purpose it exposes the exception so that it can be checked by any
+      assertion library.</p>
+      <p><a href="apidocs/com/github/stefanbirkner/fishbowl/Fishbowl.html">Read more …</a></p>
+    </div>
+    <div class="col-md-8">
+      {% highlight java %}@Test
+public void anExceptionIsThrown() {
+  String noString = null;
+  Throwable exception = exceptionThrownBy(() -> noString.trim());
+  assertEquals(NullPointerException.class, exception.getClass());
+}{% endhighlight %}
+    </div>
+  </div>
+</section>
