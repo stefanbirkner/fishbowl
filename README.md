@@ -28,9 +28,9 @@ tests only.
 
 ## Usage
 
-Fishbowl's documentation is the Javadoc of the class `Fishbowl`. It is
+Fishbowl's documentation is stored in the `gh-pages` branch and is
 available online at
-http://stefanbirkner.github.io/fishbowl/apidocs/com/github/stefanbirkner/fishbowl/Fishbowl.html
+http://stefanbirkner.github.io/fishbowl/index.html
 
 
 ## Contributing
@@ -69,34 +69,3 @@ CI.
 * Commit the modified `pom.xml` and `README.md`.
 * Run `mvn clean deploy` with JDK 6 or 7.
 * Add a tag for the release: `git tag fishbowl-X.X.X`
-
-## Release Notes
-
-### Release 1.1.1
-
-Recompile the library with JDK 7. Release 1.1.0 has been created with
-JDK 8 and because of this the library cannot be used with JDK < 8.
-Compilation aborts with the message
-
-    Unsupported major.minor version 52.0
-
-### Release 1.1.0
-
-Add a new method
-
-    exceptionThrownBy(Statement, Class<? extends Throwable>)
-
-that returns a certain type of exception. This is necessary for
-verifying the state of custom exceptions.
-
-### Release 1.0.1
-
-Recompile the library with JDK 7. Release 1.0.0 has been created with
-JDK 8 and because of this the library cannot be used with JDK < 8.
-Compilation aborts with the message
-
-    Unsupported major.minor version 52.0
-
-### Release 1.0.0
-
-Initial release.
