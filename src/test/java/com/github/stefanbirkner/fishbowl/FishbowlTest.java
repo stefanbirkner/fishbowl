@@ -7,6 +7,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
+import java.io.IOException;
+
+import static com.github.stefanbirkner.fishbowl.Fishbowl.defaultIfException;
 import static com.github.stefanbirkner.fishbowl.Fishbowl.exceptionThrownBy;
 import static com.github.stefanbirkner.fishbowl.Fishbowl.wrapCheckedException;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -134,6 +137,54 @@ public class FishbowlTest {
         @Test
         public void provideReturnValueIfNoExceptionIsThrown() {
             String value = wrapCheckedException(RETURN_EMPTY_STRING);
+            assertThat(value, is(equalTo("")));
+        }
+    }
+
+    public class DefaultIfException {
+        @Test
+        public void returnsDefaultValueIfRuntimeExceptionOfSpecifiedTypeIsThrown() {
+            String value = defaultIfException(new StatementWithReturnValue<String>() {
+                @Override
+                public String evaluate() throws Throwable {
+                    throw new NumberFormatException();
+                }
+            }, NumberFormatException.class, "dummy value");
+            assertThat(value, is(equalTo("dummy value")));
+        }
+
+        @Test
+        public void returnsDefaultValueIfCheckedExceptionOfSpecifiedTypeIsThrown() {
+            String value = defaultIfException(new StatementWithReturnValue<String>() {
+                @Override
+                public String evaluate() throws Throwable {
+                    throw new IOException();
+                }
+            }, IOException.class, "dummy value");
+            assertThat(value, is(equalTo("dummy value")));
+        }
+
+        @Test
+        public void wrapsUnhandledCheckedExceptionThrownByStatement() {
+            thrown.expect(WrappedException.class);
+            thrown.expectCause(sameInstance(DUMMY_EXCEPTION));
+            defaultIfException(THROW_DUMMY_EXCEPTION_2, IOException.class, "");
+        }
+
+        @Test
+        public void doesNotWrapRuntimeExceptionThrownByStatement() {
+            thrown.expect(sameInstance(DUMMY_RUNTIME_EXCEPTION));
+            defaultIfException(new StatementWithReturnValue<String>() {
+                @Override
+                public String evaluate() throws Throwable {
+                    throw DUMMY_RUNTIME_EXCEPTION;
+                }
+            }, IOException.class, "");
+        }
+
+        @Test
+        public void provideReturnValueIfNoExceptionIsThrown() {
+            String value = defaultIfException(RETURN_EMPTY_STRING, IOException.class, "");
             assertThat(value, is(equalTo("")));
         }
     }

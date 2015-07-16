@@ -17,6 +17,10 @@ package com.github.stefanbirkner.fishbowl;
  * statements with a return value) can be used for the third option.
  * They replace the try-catch-throw-RuntimeException snippet that is
  * usually used.
+ * <h2>Default Values</h2>
+ * <p>Sometimes exceptions are best handled by returning a default
+ * value. This can be done by a single line of code with
+ * {@link #defaultIfException(StatementWithReturnValue, Class, Object)}
  * <h2>Expose Exceptions</h2>
  * <p>Fishbowl can expose exceptions that are thrown by an arbitrary
  * piece of code. Thus you can write tests for that piece of code by
@@ -28,6 +32,47 @@ package com.github.stefanbirkner.fishbowl;
  * exceptions of a specific type only.
  */
 public class Fishbowl {
+    /**
+     * Executes the given statement and returns the statement's return
+     * value if no exception is thrown or the default value if an
+     * exception of the specified type is thrown.
+     *
+     * <pre>
+     *   public void doSomething() {
+     *     long value = defaultIfException(() -&gt; parseLong("NaN"), NumberFormatException.class, 0L);
+     *     //value is 0
+     *   }
+     * </pre>
+     *
+     * <p>(Any other checked exception is wrapped just as it is wrapped by
+     * {@link #wrapCheckedException(StatementWithReturnValue)}.)
+     *
+     * @param statement The statement that is executed.
+     * @param exceptionType the type of exception for which the default
+     *                      value is returned.
+     * @param defaultValue this value is returned if the statement
+     *                     throws an exception of the specified type.
+     * @param <V> type of the value that is returned by the statement.
+     * @return the return value of the statement or the default value.
+     */
+    public static <V> V defaultIfException(
+        StatementWithReturnValue<V> statement,
+        Class<? extends Throwable> exceptionType, V defaultValue) {
+        try {
+            return statement.evaluate();
+        } catch (RuntimeException e) {
+            if (exceptionType.isAssignableFrom(e.getClass()))
+                return defaultValue;
+            else
+                throw e;
+        } catch (Throwable e) {
+            if (exceptionType.isAssignableFrom(e.getClass()))
+                return defaultValue;
+            else
+                throw new WrappedException(e);
+        }
+    }
+
     /**
      * Executes the provided statement and returns the exception that
      * has been thrown by the statement. This is useful for writing

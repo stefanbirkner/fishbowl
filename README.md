@@ -15,7 +15,7 @@ Fishbowl is available from [Maven Central](http://search.maven.org/).
     <dependency>
       <groupId>com.github.stefanbirkner</groupId>
       <artifactId>fishbowl</artifactId>
-      <version>1.2.0</version>
+      <version>1.3.0</version>
     </dependency>
 
 Please don't forget to add the scope `test` if you use Fishbowl for
