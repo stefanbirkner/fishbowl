@@ -9,7 +9,20 @@ description: A collection of helper methods for dealing with exceptions in Java 
   <h2 class="page-header">Wrapping Exceptions</h2>
   <div class="row">
     <div class="col-md-4">
-      <p>Coming soon.</p>
+      <p>There are two options if a statement inside of a method (may) throw a
+      checked exception that cannot be handled reasonably. The exception can be
+      rethrown and the caller of the current method has to handle it or it can
+      be wrapped with a RuntimeException. Use Fishbowl's method
+      <code>wrapCheckedException</code> for doing this with a single line of
+      code.</p>
+      <p><a href="apidocs/com/github/stefanbirkner/fishbowl/Fishbowl.html#wrapCheckedException-com.github.stefanbirkner.fishbowl.Statement-">Read more …</a></p>
+    </div>
+    <div class="col-md-8">
+      {% highlight java %}public void doSomething(InputStream is) {
+  //originally both lines can throw an IOException
+  int nextByte = wrapCheckedException(() -> is.read());
+  wrapCheckedException(() -> is.close());
+}{% endhighlight %}
     </div>
   </div>
 

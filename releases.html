@@ -4,6 +4,15 @@ title: Fishbowl – Releases
 headline: Releases
 ---
 <section>
+  <h3>Release 1.2.0</h3>
+  <p>Add two methods</p>
+  {% highlight java %}wrapCheckedException(Statement)
+wrapCheckedException(StatementWithReturnValue){% endhighlight %}
+  <p>that are executing the given statements and wrap checked exceptions
+  thrown with a RuntimeException that is thrown instead. This avoids
+  that the exception's class must be added to the throws part of the
+  method's signature</p>
+
   <h3>Release 1.1.1</h3>
   <p>Recompile the library with JDK 7. Release 1.1.0 has been created with
   JDK 8 and because of this the library cannot be used with JDK &lt; 8.
