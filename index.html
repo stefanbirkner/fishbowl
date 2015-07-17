@@ -29,7 +29,17 @@ description: A collection of helper methods for dealing with exceptions in Java 
   <h2 class="page-header">Default Values</h2>
   <div class="row">
     <div class="col-md-4">
-      <p>Coming soon.</p>
+      <p>Sometimes exceptions are best handled by returning a default
+      value. This can be done by a single line of code with
+      `defaultIfException`.</p>
+      <p><a href="apidocs/com/github/stefanbirkner/fishbowl/Fishbowl.html#defaultIfException-com.github.stefanbirkner.fishbowl.StatementWithReturnValue-java.lang.Class-V-">Read more …</a></p>
+    </div>
+    <div class="col-md-8">
+      {% highlight java %}public void doSomething() {
+  long value = defaultIfException(() -> parseLong("NaN"),
+      NumberFormatException.class, 0L);
+  //value is 0
+}{% endhighlight %}
     </div>
   </div>
 
