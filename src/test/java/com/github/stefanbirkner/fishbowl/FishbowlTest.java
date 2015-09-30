@@ -9,12 +9,12 @@ import org.junit.runner.RunWith;
 
 import java.io.IOException;
 
-import static com.github.stefanbirkner.fishbowl.Fishbowl.defaultIfException;
-import static com.github.stefanbirkner.fishbowl.Fishbowl.exceptionThrownBy;
-import static com.github.stefanbirkner.fishbowl.Fishbowl.wrapCheckedException;
+import static com.github.stefanbirkner.fishbowl.Fishbowl.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.rules.ExpectedException.none;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 @RunWith(HierarchicalContextRunner.class)
 public class FishbowlTest {
@@ -35,7 +35,7 @@ public class FishbowlTest {
     @Rule
     public final ExpectedException thrown = none();
 
-    public class exceptionThrownBy_without_exception_type {
+    public class exceptionThrownBy_without_type {
         @Test
         public void returns_the_exception_that_is_thrown_by_the_provided_statement() {
             Throwable exception = exceptionThrownBy(
@@ -50,7 +50,7 @@ public class FishbowlTest {
         }
     }
 
-    public class exceptionThrownBy_with_exception_type {
+    public class exceptionThrownBy_with_type {
         @Test
         public void returns_the_exception_that_is_thrown_by_the_provided_statement_if_it_has_the_expected_type() {
             Exception exception = exceptionThrownBy(
@@ -175,6 +175,57 @@ public class FishbowlTest {
         public void returns_return_value_of_provided_statement_if_it_throws_no_exception() {
             String value = defaultIfException(RETURN_EMPTY_STRING, IOException.class, "default value");
             assertThat(value, is(equalTo("")));
+        }
+    }
+
+    public class ignoreException_without_type {
+        @Test
+        public void suppresses_an_exception_that_is_thrown_by_the_provided_statement() {
+            ignoreException(statementThatThrows(DUMMY_EXCEPTION));
+        }
+
+        @Test
+        public void executes_the_provided_statement() throws Throwable {
+            Statement statement = mock(Statement.class);
+            ignoreException(statement);
+            verify(statement).evaluate();
+        }
+    }
+
+    public class ignoreException_with_type {
+        @Test
+        public void suppresses_a_RuntimeException_of_the_expected_type_that_is_thrown_by_the_provided_statement() {
+            Statement statement = statementThatThrows(new IllegalArgumentException());
+            ignoreException(statement, IllegalArgumentException.class);
+        }
+
+        @Test
+        public void suppresses_a_checked_exception_of_the_expected_type_that_is_thrown_by_the_provided_statement() {
+            Statement statement = statementThatThrows(new AssertionError());
+            ignoreException(statement, AssertionError.class);
+        }
+
+        @Test
+        public void throws_the_runtime_exception_that_is_thrown_by_the_provided_statement_if_a_different_type_is_expected() {
+            Statement statement = statementThatThrows(new IllegalArgumentException());
+            thrown.expect(IllegalArgumentException.class);
+            ignoreException(statement, NullPointerException.class);
+        }
+
+        @Test
+        public void throws_a_WrappedException_whose_cause_is_the_exception_that_is_thrown_by_the_provided_statement_if_it_does_not_have_the_expected_type() {
+            thrown.expect(WrappedException.class);
+            thrown.expectCause(sameInstance(DUMMY_EXCEPTION));
+            ignoreException(
+                statementThatThrows(DUMMY_EXCEPTION),
+                NullPointerException.class);
+        }
+
+        @Test
+        public void executes_the_provided_statement() throws Throwable {
+            Statement statement = mock(Statement.class);
+            ignoreException(statement, RuntimeException.class);
+            verify(statement).evaluate();
         }
     }
 

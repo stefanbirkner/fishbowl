@@ -7,11 +7,10 @@ import org.junit.runner.RunWith;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import static com.github.stefanbirkner.fishbowl.Fishbowl.defaultIfException;
-import static com.github.stefanbirkner.fishbowl.Fishbowl.exceptionThrownBy;
-import static com.github.stefanbirkner.fishbowl.Fishbowl.wrapCheckedException;
+import static com.github.stefanbirkner.fishbowl.Fishbowl.*;
 import static java.lang.Long.parseLong;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test that the website's example code is working.
@@ -39,6 +38,34 @@ public class WebsiteExampleTest {
                 NumberFormatException.class, 0L);
             //value is 0
             assertEquals(0, value);
+        }
+    }
+
+    private static class IgnoringExceptios {
+        boolean somethingElseCalled = false;
+
+        public void doSomething() {
+            MyWorker worker = new MyWorker();
+            ignoreException(() -> worker.doSomethingThatThrowsAnException());
+            //the following statement is executed even if worker throws an
+            //exception.
+            doSomethingElse();
+        }
+
+        private void doSomethingElse() {
+            somethingElseCalled = true;
+        }
+
+        @Test
+        public void verifyThatTheMethodIsCompletelyExecuted() {
+            doSomething();
+            assertTrue(somethingElseCalled);
+        }
+
+        private static class MyWorker {
+            public void doSomethingThatThrowsAnException() {
+                throw new RuntimeException();
+            }
         }
     }
 

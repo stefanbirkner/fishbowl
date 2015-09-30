@@ -21,6 +21,10 @@ package com.github.stefanbirkner.fishbowl;
  * <p>Sometimes exceptions are best handled by returning a default
  * value. This can be done by a single line of code with
  * {@link #defaultIfException(StatementWithReturnValue, Class, Object)}
+ * <h2>Ignore Exceptions</h2>
+ * <p>Sometimes it is appropriate to continue if a void method fails. This can
+ * be done with {@link #ignoreException(Statement)} or
+ * {@link #ignoreException(Statement, Class)}.</p>
  * <h2>Expose Exceptions</h2>
  * <p>Fishbowl can expose exceptions that are thrown by an arbitrary
  * piece of code. Thus you can write tests for that piece of code by
@@ -211,6 +215,70 @@ public class Fishbowl {
         } catch (Throwable e) {
             throw new WrappedException(e);
         }
+    }
+
+    /**
+     * Executes the given statement and suppresses any exception thrown by the
+     * statement.
+     * <pre>
+     *   public void doSomething() {
+     *     MyWorker worker = new MyWorker();
+     *     ignoreException(() -&gt; worker.doSomethingThatThrowsAnException());
+     *     //the following statement is executed even if the worker threw an
+     *     //exception.
+     *     doSomethingElse();
+     *   }
+     * </pre>
+     *
+     * @param statement the statement that is executed.
+     * @see #ignoreException(Statement, Class)
+     */
+    public static void ignoreException(Statement statement) {
+        try {
+            statement.evaluate();
+        } catch (Throwable e) {
+        }
+    }
+
+    /**
+     * Executes the given statement and suppresses any exception of the
+     * specified type that is thrown by the statement.
+     * <pre>
+     *   public void doSomething() {
+     *     MyWorker worker = new MyWorker();
+     *     ignoreException(
+     *       () -&gt; worker.doSomethingThatThrowsAnException(),
+     *       IllegalArgumentException.class);
+     *     //the following statement is executed even if the worker threw an
+     *     //IllegalArgumentException.
+     *     doSomethingElse();
+     *   }
+     * </pre>
+     * <p>{@code RuntimeException}s of a different type are rethrown. Other
+     * exceptions of a different type are wrapped by a {@code WrappedException}
+     * that is thrown instead.
+     *
+     * @param statement the statement that is executed.
+     * @param type the type of exception that is ignored.
+     * @throws WrappedException if the statement throws a checked exception that
+     * is not of the specified {@code type}. The {@code WrappedException}'s
+     * cause is the checked exception.
+     * @throws RuntimeException if the statement throws a
+     * {@code RuntimeException} that is not of the specified {@code type}.
+     * @see #ignoreException(Statement)
+     */
+    public static void ignoreException(
+            Statement statement, Class<? extends Throwable> type) {
+        try {
+            statement.evaluate();
+        } catch (RuntimeException e) {
+            if (!type.isAssignableFrom(e.getClass()))
+                throw e;
+        } catch (Throwable e) {
+            if (!type.isAssignableFrom(e.getClass()))
+                throw new WrappedException(e);
+        }
+
     }
 
     /**
