@@ -31,18 +31,6 @@ public class FishbowlTest {
             return "";
         }
     };
-    private static final Statement THROW_DUMMY_EXCEPTION = new Statement() {
-        @Override
-        public void evaluate() throws Throwable {
-            throw DUMMY_EXCEPTION;
-        }
-    };
-    private static final StatementWithReturnValue<String> THROW_DUMMY_EXCEPTION_2 = new StatementWithReturnValue<String>() {
-        @Override
-        public String evaluate() throws Throwable {
-            throw DUMMY_EXCEPTION;
-        }
-    };
 
     @Rule
     public final ExpectedException thrown = none();
@@ -50,7 +38,8 @@ public class FishbowlTest {
     public class exceptionThrownBy_without_exception_type {
         @Test
         public void returns_the_exception_that_is_thrown_by_the_provided_statement() {
-            Throwable exception = exceptionThrownBy(THROW_DUMMY_EXCEPTION);
+            Throwable exception = exceptionThrownBy(
+                statementThatThrows(DUMMY_EXCEPTION));
             assertThat(exception, is(sameInstance(DUMMY_EXCEPTION)));
         }
 
@@ -64,13 +53,15 @@ public class FishbowlTest {
     public class exceptionThrownBy_with_exception_type {
         @Test
         public void returns_the_exception_that_is_thrown_by_the_provided_statement_if_it_has_the_expected_type() {
-            Exception exception = exceptionThrownBy(THROW_DUMMY_EXCEPTION, Exception.class);
+            Exception exception = exceptionThrownBy(
+                statementThatThrows(DUMMY_EXCEPTION), Exception.class);
             assertThat(exception, is(sameInstance(DUMMY_EXCEPTION)));
         }
 
         @Test
         public void returns_the_exception_that_is_thrown_by_the_provided_statement_if_it_is_a_subtype_of_the_expected_type() {
-            Throwable exception = exceptionThrownBy(THROW_DUMMY_EXCEPTION, Throwable.class);
+            Throwable exception = exceptionThrownBy(
+                statementThatThrows(DUMMY_EXCEPTION), Throwable.class);
             assertThat(exception, is(sameInstance(DUMMY_EXCEPTION)));
         }
 
@@ -88,7 +79,9 @@ public class FishbowlTest {
                 hasProperty("expectedType", equalTo(NullPointerException.class)),
                 hasProperty("thrownException", sameInstance(DUMMY_EXCEPTION))
             ));
-            exceptionThrownBy(THROW_DUMMY_EXCEPTION, NullPointerException.class);
+            exceptionThrownBy(
+                statementThatThrows(DUMMY_EXCEPTION),
+                NullPointerException.class);
         }
     }
 
@@ -97,7 +90,7 @@ public class FishbowlTest {
         public void throws_a_WrappedException_whose_cause_is_the_exception_that_is_thrown_by_the_provided_statement() {
             thrown.expect(WrappedException.class);
             thrown.expectCause(sameInstance(DUMMY_EXCEPTION));
-            wrapCheckedException(THROW_DUMMY_EXCEPTION);
+            wrapCheckedException(statementThatThrows(DUMMY_EXCEPTION));
         }
 
         @Test
@@ -122,18 +115,15 @@ public class FishbowlTest {
         public void throws_a_WrappedException_whose_cause_is_the_exception_that_is_thrown_by_the_provided_statement() {
             thrown.expect(WrappedException.class);
             thrown.expectCause(sameInstance(DUMMY_EXCEPTION));
-            wrapCheckedException(THROW_DUMMY_EXCEPTION_2);
+            wrapCheckedException(
+                statementWithReturnValueThatThrows(DUMMY_EXCEPTION));
         }
 
         @Test
         public void throws_the_RuntimeException_that_is_thrown_by_the_provided_statement() {
             thrown.expect(sameInstance(DUMMY_RUNTIME_EXCEPTION));
-            wrapCheckedException(new StatementWithReturnValue<String>() {
-                @Override
-                public String evaluate() throws Throwable {
-                    throw DUMMY_RUNTIME_EXCEPTION;
-                }
-            });
+            wrapCheckedException(
+                statementWithReturnValueThatThrows(DUMMY_RUNTIME_EXCEPTION));
         }
 
         @Test
@@ -146,23 +136,19 @@ public class FishbowlTest {
     public class defaultIfException {
         @Test
         public void returns_default_value_if_provided_statement_throws_RuntimeException_of_specified_type() {
-            String value = defaultIfException(new StatementWithReturnValue<String>() {
-                @Override
-                public String evaluate() throws Throwable {
-                    throw new NumberFormatException();
-                }
-            }, NumberFormatException.class, "dummy value");
+            String value = defaultIfException(
+                statementWithReturnValueThatThrows(new NumberFormatException()),
+                NumberFormatException.class,
+                "dummy value");
             assertThat(value, is(equalTo("dummy value")));
         }
 
         @Test
         public void returns_default_value_if_provided_statement_throws_checked_exception_of_specified_type() {
-            String value = defaultIfException(new StatementWithReturnValue<String>() {
-                @Override
-                public String evaluate() throws Throwable {
-                    throw new IOException();
-                }
-            }, IOException.class, "dummy value");
+            String value = defaultIfException(
+                statementWithReturnValueThatThrows(new IOException()),
+                IOException.class,
+                "dummy value");
             assertThat(value, is(equalTo("dummy value")));
         }
 
@@ -170,18 +156,19 @@ public class FishbowlTest {
         public void throws_a_WrappedException_whose_cause_is_the_exception_that_is_thrown_by_the_provided_statement_if_it_does_not_have_the_expected_type() {
             thrown.expect(WrappedException.class);
             thrown.expectCause(sameInstance(DUMMY_EXCEPTION));
-            defaultIfException(THROW_DUMMY_EXCEPTION_2, IOException.class, "");
+            defaultIfException(
+                statementWithReturnValueThatThrows(DUMMY_EXCEPTION),
+                IOException.class,
+                "");
         }
 
         @Test
         public void throws_the_RuntimeException_that_is_thrown_by_the_provided_statement_if_it_does_not_have_the_expected_type() {
             thrown.expect(sameInstance(DUMMY_RUNTIME_EXCEPTION));
-            defaultIfException(new StatementWithReturnValue<String>() {
-                @Override
-                public String evaluate() throws Throwable {
-                    throw DUMMY_RUNTIME_EXCEPTION;
-                }
-            }, IOException.class, "");
+            defaultIfException(
+                statementWithReturnValueThatThrows(DUMMY_RUNTIME_EXCEPTION),
+                IOException.class,
+                "");
         }
 
         @Test
@@ -189,5 +176,24 @@ public class FishbowlTest {
             String value = defaultIfException(RETURN_EMPTY_STRING, IOException.class, "default value");
             assertThat(value, is(equalTo("")));
         }
+    }
+
+    private static Statement statementThatThrows(final Throwable exception) {
+        return new Statement() {
+            @Override
+            public void evaluate() throws Throwable {
+                throw exception;
+            }
+        };
+    }
+
+    private static StatementWithReturnValue<String> statementWithReturnValueThatThrows(
+            final Throwable exception) {
+        return new StatementWithReturnValue<String>() {
+            @Override
+            public String evaluate() throws Throwable {
+                throw exception;
+            }
+        };
     }
 }
