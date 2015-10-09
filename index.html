@@ -31,7 +31,7 @@ description: A collection of helper methods for dealing with exceptions in Java 
     <div class="col-md-4">
       <p>Sometimes exceptions are best handled by returning a default
       value. This can be done by a single line of code with
-      `defaultIfException`.</p>
+      <code>defaultIfException</code>.</p>
       <p><a href="apidocs/com/github/stefanbirkner/fishbowl/Fishbowl.html#defaultIfException-com.github.stefanbirkner.fishbowl.StatementWithReturnValue-java.lang.Class-V-">Read more …</a></p>
     </div>
     <div class="col-md-8">
@@ -43,10 +43,20 @@ description: A collection of helper methods for dealing with exceptions in Java 
     </div>
   </div>
 
-  <h2 class="page-header">Ignoring Exceptions</h2>
+  <h2 class="page-header">Ignore Exceptions</h2>
   <div class="row">
     <div class="col-md-4">
-      <p>Coming soon.</p>
+      <p>Sometimes it is appropriate to continue if a void method fails. This can be easily done with <code>ignoreException</code>.</p>
+      <p><a href="apidocs/com/github/stefanbirkner/fishbowl/Fishbowl.html#ignoreException-com.github.stefanbirkner.fishbowl.Statement-">Read more …</a></p>
+    </div>
+    <div class="col-md-8">
+      {% highlight java %}public void doSomething() {
+  MyWorker worker = new MyWorker();
+  ignoreException(() -> worker.doSomethingThatThrowsAnException());
+  //the following statement is executed even if worker throws an
+  //exception.
+  doSomethingElse();
+}{% endhighlight %}
     </div>
   </div>
 

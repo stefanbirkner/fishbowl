@@ -4,10 +4,19 @@ title: Fishbowl – Releases
 headline: Releases
 ---
 <section>
+  <h3>Release 1.4.0</h3>
+  <p>Add two methods</p>
+  {% highlight java %}ignoreException(Statement)
+ignoreException(Statement, Class<? extends Throwable>){% endhighlight %}
+  <p>that are execute the given statements and suppress exceptions that
+  are thrown by these statements. The first method suppresses all exceptions
+  while the second method suppresses only exceptions of the specified
+  type.</p>
+
   <h3>Release 1.3.0</h3>
   <p>Add method</p>
-  {% highlight java %}defaultIfException(StatementWithReturnValu,
-  Class<? extends Throwable> exceptionType, Object){% endhighlight %}
+  {% highlight java %}defaultIfException(StatementWithReturnValue statement,
+  Class<? extends Throwable> exceptionType, Object defaultValue){% endhighlight %}
   <p>that executes the given statement and returns the default value if
   the specified type of exception is thrown.</p>
 
