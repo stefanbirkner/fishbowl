@@ -18,6 +18,7 @@ import static org.mockito.Mockito.verify;
 
 @RunWith(HierarchicalContextRunner.class)
 public class FishbowlTest {
+    private static final Error DUMMY_ERROR = new Error();
     private static final Throwable DUMMY_EXCEPTION = new Exception();
     private static final RuntimeException DUMMY_RUNTIME_EXCEPTION = new RuntimeException();
     private static final Statement DO_NOTHING = new Statement() {
@@ -105,6 +106,12 @@ public class FishbowlTest {
         }
 
         @Test
+        public void throws_the_Error_that_is_thrown_by_the_provided_statement() {
+            thrown.expect(sameInstance(DUMMY_ERROR));
+            wrapCheckedException(statementThatThrows(DUMMY_ERROR));
+        }
+
+        @Test
         public void throws_no_exception_if_the_provided_statement_throws_no_exception() {
             wrapCheckedException(DO_NOTHING);
         }
@@ -124,6 +131,13 @@ public class FishbowlTest {
             thrown.expect(sameInstance(DUMMY_RUNTIME_EXCEPTION));
             wrapCheckedException(
                 statementWithReturnValueThatThrows(DUMMY_RUNTIME_EXCEPTION));
+        }
+
+        @Test
+        public void throws_the_Error_that_is_thrown_by_the_provided_statement() {
+            thrown.expect(sameInstance(DUMMY_ERROR));
+            wrapCheckedException(
+                statementWithReturnValueThatThrows(DUMMY_ERROR));
         }
 
         @Test
@@ -153,6 +167,15 @@ public class FishbowlTest {
         }
 
         @Test
+        public void returns_default_value_if_provided_statement_throws_error_of_specified_type() {
+            String value = defaultIfException(
+                statementWithReturnValueThatThrows(new AssertionError()),
+                AssertionError.class,
+                "dummy value");
+            assertThat(value, is(equalTo("dummy value")));
+        }
+
+        @Test
         public void throws_a_WrappedException_whose_cause_is_the_exception_that_is_thrown_by_the_provided_statement_if_it_does_not_have_the_expected_type() {
             thrown.expect(WrappedException.class);
             thrown.expectCause(sameInstance(DUMMY_EXCEPTION));
@@ -171,6 +194,14 @@ public class FishbowlTest {
                 "");
         }
 
+        @Test
+        public void throws_the_Error_that_is_thrown_by_the_provided_statement_if_it_does_not_have_the_expected_type() {
+            thrown.expect(sameInstance(DUMMY_ERROR));
+            defaultIfException(
+                statementWithReturnValueThatThrows(DUMMY_ERROR),
+                IOException.class,
+                "");
+        }
         @Test
         public void returns_return_value_of_provided_statement_if_it_throws_no_exception() {
             String value = defaultIfException(RETURN_EMPTY_STRING, IOException.class, "default value");
@@ -200,6 +231,12 @@ public class FishbowlTest {
         }
 
         @Test
+        public void suppresses_an_Error_of_the_expected_type_that_is_thrown_by_the_provided_statement() {
+            Statement statement = statementThatThrows(new AssertionError());
+            ignoreException(statement, AssertionError.class);
+        }
+
+        @Test
         public void suppresses_a_checked_exception_of_the_expected_type_that_is_thrown_by_the_provided_statement() {
             Statement statement = statementThatThrows(new AssertionError());
             ignoreException(statement, AssertionError.class);
@@ -209,6 +246,13 @@ public class FishbowlTest {
         public void throws_the_runtime_exception_that_is_thrown_by_the_provided_statement_if_a_different_type_is_expected() {
             Statement statement = statementThatThrows(new IllegalArgumentException());
             thrown.expect(IllegalArgumentException.class);
+            ignoreException(statement, NullPointerException.class);
+        }
+
+        @Test
+        public void throws_the_Error_that_is_thrown_by_the_provided_statement_if_a_different_type_is_expected() {
+            Statement statement = statementThatThrows(new AssertionError());
+            thrown.expect(AssertionError.class);
             ignoreException(statement, NullPointerException.class);
         }
 

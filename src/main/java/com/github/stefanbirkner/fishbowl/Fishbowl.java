@@ -69,6 +69,11 @@ public class Fishbowl {
                 return defaultValue;
             else
                 throw e;
+        } catch (Error e) {
+            if (exceptionType.isAssignableFrom(e.getClass()))
+                return defaultValue;
+            else
+                throw e;
         } catch (Throwable e) {
             if (exceptionType.isAssignableFrom(e.getClass()))
                 return defaultValue;
@@ -171,6 +176,8 @@ public class Fishbowl {
             statement.evaluate();
         } catch (RuntimeException e) {
             throw e;
+        } catch (Error e) {
+            throw e;
         } catch (Throwable e) {
             throw new WrappedException(e);
         }
@@ -211,6 +218,8 @@ public class Fishbowl {
         try {
             return statement.evaluate();
         } catch (RuntimeException e) {
+            throw e;
+        } catch (Error e) {
             throw e;
         } catch (Throwable e) {
             throw new WrappedException(e);
@@ -265,6 +274,8 @@ public class Fishbowl {
      * cause is the checked exception.
      * @throws RuntimeException if the statement throws a
      * {@code RuntimeException} that is not of the specified {@code type}.
+     * @throws Error if the statement throws an {@code Error} that is not of the
+     * specified {@code type}.
      * @see #ignoreException(Statement)
      */
     public static void ignoreException(
@@ -272,6 +283,9 @@ public class Fishbowl {
         try {
             statement.evaluate();
         } catch (RuntimeException e) {
+            if (!type.isAssignableFrom(e.getClass()))
+                throw e;
+        } catch (Error e) {
             if (!type.isAssignableFrom(e.getClass()))
                 throw e;
         } catch (Throwable e) {
