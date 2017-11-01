@@ -4,6 +4,10 @@ title: Fishbowl – Releases
 headline: Releases
 ---
 <section>
+  <h3>Release 1.4.1</h3>
+  <p>The methods <code>defaultIfException</code>,
+  <code>wrapCheckedException</code> and <code>ignoreException</code> don't wrap
+  <code>Error</code>s anymore because they are not checked exceptions.</p>
   <h3>Release 1.4.0</h3>
   <p>Add two methods</p>
   {% highlight java %}ignoreException(Statement)
